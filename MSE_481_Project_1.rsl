@@ -63,7 +63,7 @@ SOR,30 EOR,30
 RCM,temp error
 SOR,31 EOR,31
 RCM,storing e values for discretization
-SOR,32 EOR,32
+SOR,32 XIC,I:1/3 OTL,O:2/2 EOR,32
 RCM,Discretized PID
 SOR,33 EOR,33
 RCM,initialize u
