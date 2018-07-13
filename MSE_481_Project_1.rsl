@@ -1,5 +1,5 @@
 FILE,LAD 2
-SOR,0 EOR,0
+SOR,0 XIC,S:1/15 MOV,0,F8:17 MOV,1,F8:10 MOV,1000,F8:11 MOV,100,F8:12 EOR,0
 RCM,Manual operation of pumps and mixer
 SOR,1 XIC,I:1/9 XIC,I:1/0 OTL,O:2/1 EOR,1
 RCM,-    Mode A Control
@@ -69,7 +69,7 @@ SOR,33 MOV,N7:97,N7:96 EOR,33
 RCM,
 SOR,34 EOR,34
 RCM,
-SOR,35 FRD,O:4,N7:98 SUB,N7:98,N7:99,N7:97 EOR,35
+SOR,35 FRD,O:4,N7:98 SUB,N7:99,N7:98,N7:97 EOR,35
 RCM,Calculatring current Error
 SOR,36 EOR,36
 RCM,
@@ -89,24 +89,24 @@ SOR,43 JSR,U:4 EOR,43
 RCM,du
 SOR,44 EOR,44
 RCM,
-SOR,45 EOR,45
+SOR,45 ADD,F8:17,F8:16,F8:17 EOR,45
 RCM,u+du
-SOR,46 EOR,46
-RCM,
-SOR,47 EOR,47
+SOR,46 LES,F8:17,0 MOV,0,F8:17 EOR,46
 RCM,resetting to prevent integral windup
-SOR,48 EOR,48
+SOR,47 GRT,F8:17,1000 MOV,1000,F8:17 EOR,47
 RCM,
-SOR,49 JSR,U:3 EOR,49
-RCM,Control Signal PWM
+SOR,48 DIV,F8:17,10,N7:2 EOR,48
+RCM,
+SOR,49 XIC,I:1/4 JSR,U:3 EOR,49
+RCM,Run PWM if tank is full
 FILE,SBR 3:
 SOR,0 SBR,U:3 EOR,0
-RCM,This Subroutine generates a PWM signal based on the duty cycle found in "N7:2" and it outputs this PWM signal to "B3:2/0"
+RCM,This Subroutine generates a PWM signal based on the duty cycle found in "N7:2" and it outputs this PWM signal to the heater (O:2/04)
 SOR,1 TON,T4:5,100 EOR,1
 RCM,
 SOR,2 XIC,T4:5/DN RES,T4:5 EOR,2
 RCM,
-SOR,3 LES,T4:5.ACC,N7:2 OTE,B3:2/0 EOR,3
+SOR,3 LES,T4:5.ACC,N7:2 OTE,O:2/4 EOR,3
 RCM,
 SOR,4 RET,U:3 EOR,4
 RCM,
@@ -114,10 +114,10 @@ SOR,5 END,5
 RCM,
 FILE,SBR 4:
 SOR,0 SBR,U:4 EOR,0
-RCM,Calculates du given (K_c [F8:10], T_d [F8:11], T_i [F8:12]). The output is then placed in F8:16  *** Note dt is 0.1 ***
+RCM,Calculates du given (K_c [F8:10], T_d [F8:11], T_i [F8:12]). The output is then placed in F8:16  *** Note dt is 0.1 and T_i is 1/T_i ***
 SOR,1 SUB,N7:97,N7:96,F8:15 EOR,1
 RCM,e(k) - e(k - 1)
-SOR,2 DIV,N7:97,10,F8:13 DIV,F8:13,F8:12,F8:13 EOR,2
+SOR,2 DIV,N7:97,10,F8:13 MUL,F8:13,F8:12,F8:13 EOR,2
 RCM,e(k) * dt / T_i
 SOR,3 MUL,N7:96,2,F8:14 SUB,N7:97,F8:14,F8:14 ADD,F8:14,N7:95,F8:14 EOR,3
 RCM,e(k) - 2e(k - 1) +e(k - 2)
@@ -147,7 +147,7 @@ RCM,
 BTBL
 0
 0
-1
+0
 0
 0
 0
@@ -246,9 +246,8 @@ BTBL
 0
 0
 NTBL
+560
 0
-1300
-10
 0
 0
 0
@@ -341,34 +340,34 @@ NTBL
 0
 0
 0
-160
-160
-160
-160
 0
-FTBL
-160
-160
-160
-160
-16
+3
+3
+3
+297
 300
--1
-1940
+FTBL
+163
+723
+323
+297
+29
+0
+0
+0
 0
 0
 1
-1
-1
-16
+1000
+100
 0
 0
-16
 0
 0
 0
 0
 0
+400
 0
 0
 0
@@ -402,7 +401,6 @@ FTBL
 0
 0
 0
--1
 0
 0
 0
@@ -427,17 +425,19 @@ FTBL
 0
 0
 0
--1
--1
--1
 0
--2
-1
 0
--1
 0
--1
--1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
 0
 0
 0
@@ -466,3 +466,4 @@ T4:0 Period Timer
 T4:5 PWM Timer
 B3:2/0 PWM Out
 U:4 Calculate du
+? Initialize T_i
