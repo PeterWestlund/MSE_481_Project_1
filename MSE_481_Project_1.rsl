@@ -85,7 +85,7 @@ SOR,41 EOR,41
 RCM,initialize u
 SOR,42 EOR,42
 RCM,
-SOR,43 EOR,43
+SOR,43 JSR,U:4 EOR,43
 RCM,du
 SOR,44 EOR,44
 RCM,
@@ -113,7 +113,21 @@ RCM,
 SOR,5 END,5
 RCM,
 FILE,SBR 4:
-SOR,0 END,0
+SOR,0 SBR,U:4 EOR,0
+RCM,Calculates du given (K_c [F8:10], T_d [F8:11], T_i [F8:12]). The output is then placed in F8:16  *** Note dt is 0.1 ***
+SOR,1 SUB,N7:97,N7:96,F8:15 EOR,1
+RCM,e(k) - e(k - 1)
+SOR,2 DIV,N7:97,10,F8:13 DIV,F8:13,F8:12,F8:13 EOR,2
+RCM,e(k) * dt / T_i
+SOR,3 MUL,N7:96,2,F8:14 SUB,N7:97,F8:14,F8:14 ADD,F8:14,N7:95,F8:14 EOR,3
+RCM,e(k) - 2e(k - 1) +e(k - 2)
+SOR,4 MUL,F8:14,F8:11,F8:14 MUL,F8:14,10,F8:14 EOR,4
+RCM,T_d * [e(k) - 2e(k - 1) +e(k - 2)] / dt
+SOR,5 ADD,F8:15,F8:13,F8:16 ADD,F8:16,F8:14,F8:16 MUL,F8:16,F8:10,F8:16 EOR,5
+RCM,K_c * { e(k) - e(k - 1)    +    e(k) * dt / T_i    +    T_d * [e(k) - 2e(k - 1) +e(k - 2)] / dt }
+SOR,6 RET,U:4 EOR,6
+RCM,
+SOR,7 END,7
 RCM,
 FILE,SBR 5:
 SOR,0 END,0
@@ -133,7 +147,7 @@ RCM,
 BTBL
 0
 0
-1
+0
 0
 0
 0
@@ -329,9 +343,9 @@ NTBL
 0
 0
 0
-0
-0
-0
+-40
+160
+200
 FTBL
 160
 160
@@ -451,3 +465,4 @@ U:3 PWM
 T4:0 Period Timer
 T4:5 PWM Timer
 B3:2/0 PWM Out
+U:4 Calculate du
