@@ -1,0 +1,472 @@
+FILE,LAD 2
+SOR,0 XIC,S:1/15 MOV,0,F8:17 MOV,1,F8:10 MOV,1000,F8:11 MOV,100,F8:12 EOR,0
+RCM,Manual operation of pumps and mixer
+SOR,1 XIC,I:1/9 XIC,I:1/0 OTL,O:2/1 EOR,1
+RCM,-    Mode A Control
+SOR,2 BST,1 XIC,I:1/4 NXB,1 XIO,I:1/1 BND,1 OTU,O:2/1 EOR,2
+RCM,
+SOR,3 XIC,I:1/10 XIC,I:1/0 OTL,O:2/2 EOR,3
+RCM,-    Mode B Control
+SOR,4 BST,1 XIC,I:1/4 NXB,1 XIO,I:1/1 BND,1 OTU,O:2/2 EOR,4
+RCM,
+SOR,5 XIC,I:1/11 XIC,I:1/0 OTL,O:2/3 EOR,5
+RCM,-    Mode C Control
+SOR,6 BST,1 XIO,I:1/3 NXB,1 XIO,I:1/1 BND,1 OTU,O:2/0 OTU,O:2/3 EOR,6
+RCM,
+SOR,7 XIC,I:1/3 OTL,O:2/0 EOR,7
+RCM,
+SOR,8 BST,1 XIC,O:2/1 NXB,1 XIC,O:2/2 BND,1 TON,T4:0,0 EOR,8
+RCM,Simulating Temperature reading
+SOR,9 XIC,T4:0/DN CTU,C5:0,0 EOR,9
+RCM,
+SOR,10 TOD,C5:0.ACC,F8:20 EOR,10
+RCM,
+SOR,11 XIC,T4:0/DN RES,T4:0 EOR,11
+RCM,
+SOR,12 XIC,O:2/3 TON,T4:1,0 EOR,12
+RCM,
+SOR,13 XIC,T4:1/DN CTU,C5:1,0 EOR,13
+RCM,
+SOR,14 XIC,T4:1/DN RES,T4:1 EOR,14
+RCM,
+SOR,15 XIC,O:2/4 TON,T4:3,0 EOR,15
+RCM,
+SOR,16 XIC,T4:3/DN CTU,C5:2,0 EOR,16
+RCM,
+SOR,17 XIC,T4:3/DN RES,T4:3 EOR,17
+RCM,
+SOR,18 MUL,C5:2.ACC,10,N7:0 EOR,18
+RCM,
+SOR,19 TON,T4:4,0 EOR,19
+RCM,
+SOR,20 XIC,T4:4/DN CTU,C5:3,0 EOR,20
+RCM,
+SOR,21 XIC,T4:4/DN RES,T4:4 EOR,21
+RCM,
+SOR,22 ADD,160,C5:1.ACC,F8:0 ADD,F8:0,N7:0,F8:1 EOR,22
+RCM,
+SOR,23 LEQ,F8:1,160 OTE,O:6/0 EOR,23
+RCM,
+SOR,24 XIC,O:6/0 SUB,F8:1,0,F8:2 SUB,F8:2,0,F8:3 EOR,24
+RCM,
+SOR,25 GRT,F8:1,160 OTE,O:6/1 EOR,25
+RCM,
+SOR,26 XIC,O:6/1 XIC,I:1/3 SUB,F8:1,F8:20,F8:2 SUB,F8:2,C5:3.ACC,F8:3 EOR,26
+RCM,
+SOR,27 DIV,F8:3,10,F8:4 EOR,27
+RCM,
+SOR,28 TOD,F8:3,O:4 EOR,28
+RCM,
+SOR,29 FRD,I:3,N7:99 EOR,29
+RCM,read temp setpoint
+SOR,30 EOR,30
+RCM,
+SOR,31 EOR,31
+RCM,
+SOR,32 MOV,N7:96,N7:95 EOR,32
+RCM,Shifting error values for Discretization
+SOR,33 MOV,N7:97,N7:96 EOR,33
+RCM,
+SOR,34 EOR,34
+RCM,
+SOR,35 FRD,O:4,N7:98 SUB,N7:99,N7:98,N7:97 EOR,35
+RCM,Calculatring current Error
+SOR,36 EOR,36
+RCM,
+SOR,37 EOR,37
+RCM,
+SOR,38 EOR,38
+RCM,Discretized PID
+SOR,39 EOR,39
+RCM,
+SOR,40 EOR,40
+RCM,
+SOR,41 EOR,41
+RCM,initialize u
+SOR,42 EOR,42
+RCM,
+SOR,43 JSR,U:4 EOR,43
+RCM,du
+SOR,44 EOR,44
+RCM,
+SOR,45 ADD,F8:17,F8:16,F8:17 EOR,45
+RCM,u+du
+SOR,46 LES,F8:17,0 MOV,0,F8:17 EOR,46
+RCM,resetting to prevent integral windup
+SOR,47 GRT,F8:17,1000 MOV,1000,F8:17 EOR,47
+RCM,
+SOR,48 DIV,F8:17,10,N7:2 EOR,48
+RCM,
+SOR,49 XIC,I:1/3 JSR,U:5 EOR,49
+RCM,Run ON/OFF control if tank is not empty
+FILE,SBR 3:
+SOR,0 SBR,U:3 EOR,0
+RCM,This Subroutine generates a PWM signal based on the duty cycle found in "N7:2" and it outputs this PWM signal to the heater (O:2/04)
+SOR,1 TON,T4:5,100 EOR,1
+RCM,
+SOR,2 XIC,T4:5/DN RES,T4:5 EOR,2
+RCM,
+SOR,3 LES,T4:5.ACC,N7:2 OTE,O:2/4 EOR,3
+RCM,
+SOR,4 RET,U:3 EOR,4
+RCM,
+SOR,5 END,5
+RCM,
+FILE,SBR 4:
+SOR,0 SBR,U:4 EOR,0
+RCM,Calculates du given (K_c [F8:10], T_d [F8:11], T_i [F8:12]). The output is then placed in F8:16  *** Note dt is 0.1 and T_i is 1/T_i ***
+SOR,1 SUB,N7:97,N7:96,F8:15 EOR,1
+RCM,e(k) - e(k - 1)
+SOR,2 DIV,N7:97,10,F8:13 MUL,F8:13,F8:12,F8:13 EOR,2
+RCM,e(k) * dt / T_i
+SOR,3 MUL,N7:96,2,F8:14 SUB,N7:97,F8:14,F8:14 ADD,F8:14,N7:95,F8:14 EOR,3
+RCM,e(k) - 2e(k - 1) +e(k - 2)
+SOR,4 MUL,F8:14,F8:11,F8:14 MUL,F8:14,10,F8:14 EOR,4
+RCM,T_d * [e(k) - 2e(k - 1) +e(k - 2)] / dt
+SOR,5 ADD,F8:15,F8:13,F8:16 ADD,F8:16,F8:14,F8:16 MUL,F8:16,F8:10,F8:16 EOR,5
+RCM,K_c * { e(k) - e(k - 1)    +    e(k) * dt / T_i    +    T_d * [e(k) - 2e(k - 1) +e(k - 2)] / dt }
+SOR,6 RET,U:4 EOR,6
+RCM,
+SOR,7 END,7
+RCM,
+FILE,SBR 5:
+SOR,0 GEQ,N7:97,N7:90 OTL,O:2/4 EOR,0
+RCM,Error >= 0  then Heater will turn on
+SOR,1 LES,N7:97,N7:90 OTU,O:2/4 EOR,1
+RCM,Error <=0 then heater will turn off
+SOR,2 END,2
+RCM,
+FILE,SBR 6:
+SOR,0 END,0
+RCM,
+FILE,SBR 7:
+SOR,0 END,0
+RCM,
+FILE,SBR 8:
+SOR,0 END,0
+RCM,
+FILE,SBR 9:
+SOR,0 END,0
+RCM,
+BTBL
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+NTBL
+1030
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+-1
+-1
+-1
+201
+200
+FTBL
+180
+1210
+1066
+201
+20
+0
+0
+0
+0
+0
+1
+1000
+100
+-100
+0
+0
+-100
+0
+0
+0
+144
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+SYMBOLS
+I:1/0 start
+I:1/9 A
+I:1/10 B
+I:1/11 C
+O:2/1 p1
+O:2/2 p2
+O:2/3 p3
+I:1/1 stop
+I:1/8 Enter
+O:2/4 Heater
+I:1/4 HI-Level
+I:1/3 LO-Level
+U:6 PWM
+U:3 PWM
+T4:0 Period Timer
+T4:5 PWM Timer
+B3:2/0 PWM Out
+U:4 Calculate du
